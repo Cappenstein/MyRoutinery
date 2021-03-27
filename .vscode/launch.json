@@ -1,0 +1,24 @@
+{
+	"configurations": [
+		{
+			"type": "node-terminal",
+			"name": "Run Script: dev",
+			"request": "launch",
+			"command": "yarn run dev",
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"name": "Launch localhost",
+			"type": "firefox",
+			"request": "launch",
+			"reAttach": true,
+			"url": "localhost:5000",
+			"pathMappings": [
+				{
+					"url": "http://localhost:5000/src",
+					"path": "${workspaceFolder}/src"
+				}
+			]
+		}
+	]
+}
