@@ -3,6 +3,8 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+	import { taskStorage } from './localstore';
+
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
 
@@ -21,50 +23,67 @@
 		},
 	});
 
-	export let todos = [];
+	export let tasks = [];
 
+	/**
+	 * Move the task associated with the button up in the routine
+	 * @param event
+	 */
 	function moveUp(event) {
+		// TODO: Make this smarter
 		const routine_id = event.detail;
-		for (var i = 0; i < todos.length; i++) {
-			if (todos[i].routine_id == routine_id) {
+		for (var i = 0; i < tasks.length; i++) {
+			if (tasks[i].routine_id == routine_id) {
 				if (i === 0) {
 					return;
 				}
-				let move_todo = todos[i - 1];
-				todos[i - 1] = todos[i];
-				todos[i] = move_todo;
+				let move_task = tasks[i - 1];
+				tasks[i - 1] = tasks[i];
+				tasks[i] = move_task;
 			}
 		}
+		taskStorage.set(tasks);
 	}
+
+	/**
+	 * Move the task associated with the button down in the routine
+	 * @param event
+	 */
 	function moveDown(event) {
+		// TODO: Make this smarter
 		const routine_id = event.detail;
-		for (var i = 0; i < todos.length; i++) {
-			if (todos[i].routine_id == routine_id) {
-				if (i === todos.length - 1) {
+		for (var i = 0; i < tasks.length; i++) {
+			if (tasks[i].routine_id == routine_id) {
+				if (i === tasks.length - 1) {
 					return;
 				}
-				let move_todo = todos[i + 1];
-				todos[i + 1] = todos[i];
-				todos[i] = move_todo;
+				let move_task = tasks[i + 1];
+				tasks[i + 1] = tasks[i];
+				tasks[i] = move_task;
 				break;
 			}
 		}
+		taskStorage.set(tasks);
 	}
 
+	/**
+	 * Remove the task associated with the button from the routine
+	 * @param event
+	 */
 	function remove(event) {
-		todos = todos.filter((t) => t.routine_id !== event.detail);
-		console.log(todos);
+		tasks = tasks.filter((t) => t.routine_id !== event.detail);
+		taskStorage.set(tasks);
 	}
 </script>
 
-{#each todos as todo (todo.routine_id)}
+{#each tasks as task (task.routine_id)}
 	<div
-		in:receive={{ key: todo.routine_id }}
-		out:send={{ key: todos.routine_id }}
+		in:receive={{ key: task.routine_id }}
+		out:send={{ key: task.routine_id }}
 		animate:flip={{ duration: 200 }}
 	>
 		<Task
-			{...todo}
+			{...task}
 			on:moveup={moveUp}
 			on:movedown={moveDown}
 			on:remove={remove}

@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
 
-export const content = writable<Array<{ todo_name: string, duration: number, routine_id: number }>>([]);
+export const taskStorage = writable<Array<{ task_name: string, duration: number, routine_id: number }>>(localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : []);
 
-// content.subscribe((value) => localStorage.content = JSON.stringify(value));
+taskStorage.subscribe((value) => localStorage.tasks = JSON.stringify(value));

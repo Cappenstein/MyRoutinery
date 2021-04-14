@@ -3,7 +3,7 @@
 
 	const dispatch = createEventDispatcher();
 	export let routine_id: number;
-	export let todo_name: string;
+	export let task_name: string;
 	export let duration: number;
 	let playButton: HTMLButtonElement;
 	let remaining_duration = duration;
@@ -13,6 +13,9 @@
 	let interval: number = null;
 	$: remaining = Math.max(remaining_duration - elapsed, 0);
 
+	/**
+	 * Stop the timer for the task
+	 */
 	function stopTimer() {
 		if (interval) {
 			window.clearInterval(interval);
@@ -23,20 +26,28 @@
 		playButton.innerHTML = '▶';
 	}
 
-	function timerClick(event: Event) {
+	/**
+	 * Handle the timer start button getting clicked
+	 * This function will stop the interval if it's already running (pause)
+	 * OR create the interval to keep track of the time
+	 */
+	function timerClick() {
 		if (interval) {
 			stopTimer();
 			return;
 		}
 
+		// Every 100 ms update the remaining time
 		start = new Date();
 		interval = window.setInterval(() => {
 			elapsed = Math.floor((Date.now() - start.getTime()) / 1000);
-			console.log(remaining);
 		}, 100);
 		playButton.innerHTML = '⏸';
 	}
 
+	/**
+	 * Update the remaining time to 0 when the task is marked as completed.
+	 */
 	function completeChecked() {
 		if (completed) {
 			stopTimer();
@@ -46,15 +57,25 @@
 		}
 	}
 
+	/**
+	 * Forward the moveup event to the parent
+	 */
 	function moveUp() {
 		dispatch('moveup', routine_id);
 	}
 
+	/**
+	 * Forward the movedown event to the parent
+	 */
 	function moveDown() {
 		dispatch('movedown', routine_id);
 	}
 
+	/**
+	 * Confirm the user wants to remove the task and then forward the event to the parent
+	 */
 	function remove() {
+		// TODO: Make this use something other than the default window.confirm
 		var conf = confirm('Are you sure you want to remove this task?');
 		if (conf) {
 			stopTimer();
@@ -66,7 +87,7 @@
 <div class="task" class:completed on:change={completeChecked}>
 	<input id="routine-{routine_id}" type="checkbox" bind:checked={completed} />
 	<label style="inline-block" for="routine-{routine_id}">
-		{todo_name} - {Math.floor(remaining / 60)}:{(remaining % 60)
+		{task_name} - {Math.floor(remaining / 60)}:{(remaining % 60)
 			.toString()
 			.padStart(2, '0')}
 	</label>
