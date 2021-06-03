@@ -31,7 +31,7 @@
 	 * This function will stop the interval if it's already running (pause)
 	 * OR create the interval to keep track of the time
 	 */
-	function timerClick() {
+	export function timerClick() {
 		if (interval) {
 			stopTimer();
 			return;
@@ -55,6 +55,10 @@
 		} else {
 			elapsed = 0;
 		}
+		dispatch('completeChecked', {
+			routine_id: routine_id,
+			completed: completed,
+		});
 	}
 
 	/**

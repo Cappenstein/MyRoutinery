@@ -24,6 +24,7 @@
 	});
 
 	export let tasks = [];
+	let taskComponents = [];
 
 	/**
 	 * Move the task associated with the button up in the routine
@@ -66,6 +67,26 @@
 		taskStorage.set(tasks);
 	}
 
+	function completeChecked(event) {
+		let task = null;
+		if (!event.detail.completed) {
+			return;
+		}
+		for (let i = 0; i < tasks.length; i++) {
+			if (
+				tasks[i].routine_id == event.detail.routine_id &&
+				i + 1 < tasks.length
+			) {
+				const next_routine_id = tasks[i + 1].routine_id;
+				task = taskComponents[next_routine_id];
+				break;
+			}
+		}
+		if (task) {
+			task.timerClick();
+		}
+	}
+
 	/**
 	 * Remove the task associated with the button from the routine
 	 * @param event
@@ -87,6 +108,8 @@
 			on:moveup={moveUp}
 			on:movedown={moveDown}
 			on:remove={remove}
+			on:completeChecked={completeChecked}
+			bind:this={taskComponents[task.routine_id]}
 		/>
 	</div>
 {/each}
